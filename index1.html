@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .guest-list {
+            margin-top: 20px;
+        }
+        .guest {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .guest:last-child {
+            border-bottom: none;
+        }
+        .guest h3 {
+            margin: 0 0 5px;
+        }
+        .guest .tags {
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Guest Book</h1>
+
+    <!-- Guest Book Form -->
+    <form id="guestForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        
+        <label for="tags">Tags:</label>
+        <select id="tags" name="tags" multiple required>
+            <option value="Researchers">Researchers</option>
+            <option value="Farmers">Farmers</option>
+            <option value="Scientists">Scientists</option>
+            <option value="Guest Users">Guest Users</option>
+         
+         
+        </select>
+        
+        <input type="submit" value="Submit">
+    </form>
+
+    <div class="guest-list" id="guestList">
+        <!-- Guest entries will be dynamically added here -->
+    </div>
+</div>
+
+<script>
+    document.getElementById("guestForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var name = document.getElementById("name").value;
+        var email = document.getElementById("email").value;
+        var message = document.getElementById("message").value;
+        var tags = Array.from(document.getElementById("tags").selectedOptions).map(option => option.value);
+
+        var storedEntries = JSON.parse(localStorage.getItem('guestEntries')) || [];
+        
+        var entryNumber = storedEntries.length + 1;
+
+        var guestEntry = {
+            entryNumber: entryNumber,
+            name: name,
+            email: email,
+            message: message,
+            tags: tags
+        };
+
+        storedEntries.push(guestEntry);
+        localStorage.setItem('guestEntries', JSON.stringify(storedEntries));
+
+        addGuestEntry(guestEntry);
+
+        document.getElementById("guestForm").reset();
+    });
+
+    function addGuestEntry(entry) {
+        var guestEntry = document.createElement("div");
+        guestEntry.classList.add("guest");
+        guestEntry.innerHTML = `
+            <h3>Entry ${entry.entryNumber} by ${entry.name}</h3>
+            <p>Email: ${entry.email}</p>
+            <p>Message: ${entry.message}</p>
+            <p class="tags">Tags: ${entry.tags.join(", ")}</p>
+        `;
+        document.getElementById("guestList").appendChild(guestEntry);
+    }
+
+    window.addEventListener('load', function() {
+        var storedEntries = JSON.parse(localStorage.getItem('guestEntries'));
+        if (storedEntries) {
+            storedEntries.forEach(function(entry) {
+                addGuestEntry(entry);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
